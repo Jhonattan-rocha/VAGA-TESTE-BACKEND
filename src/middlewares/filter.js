@@ -62,7 +62,7 @@ export default async (req, res, next) => {
                 req.filter = {
                     where: {
                         [query[0]]: {
-                            [Op.like]: query[2]
+                            [Op.like]: "%"+query[2]+"%"
                         }
                     }
                 }
@@ -129,7 +129,7 @@ export default async (req, res, next) => {
                     };
                 } else if (operator === 'like') {
                     filter[attribute] = {
-                        [Op.like]: value
+                        [Op.like]: "%"+value+"%"
                     };
                 }
                 if(Object.keys(filter).length !== 0){

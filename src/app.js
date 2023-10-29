@@ -1,6 +1,7 @@
 import empresaRouter from './routes/empresaRoutes';
 import tokenRouter from './routes/tokenRoutes';
 import arquivosRouter from './routes/arquivosRoutes';
+import usuariosRouter from './routes/authRoutes';
 
 import express from 'express';
 import cors from 'cors';
@@ -44,6 +45,7 @@ class App {
     this.app.use(empresaRouter);
     this.app.use(tokenRouter);
     this.app.use(arquivosRouter);
+    this.app.use(usuariosRouter);
   }
 
 }
