@@ -5,6 +5,7 @@ import { GetConnection } from '../services/TenantLoader';
 
 export default async (req, res, next) =>{
     require('dotenv').config()
+
     const { authorization } = req.headers;
     if (!authorization){
         return res.status(401).json({

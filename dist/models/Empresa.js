@@ -2,7 +2,7 @@
 var _md5 = require('md5'); var _md52 = _interopRequireDefault(_md5);
 
 
- class Funcionario extends _sequelize.Model{
+ class Empresas extends _sequelize.Model{
     static init(sequelize){
         super.init({
           id: {
@@ -16,13 +16,13 @@ var _md5 = require('md5'); var _md52 = _interopRequireDefault(_md5);
             type: _sequelize2.default.STRING(100),
             allowNull: false
           },
-          cpf:{
+          cnpj:{
             type: _sequelize2.default.STRING(11),
             allowNull: false,
             unique: true,
             validate: {
                 cpfValidator: function(value){
-                    if (String(value).replace(/\D/g, '').length !== 11){
+                    if (String(value).replace(/\D/g, '').length !== 14){
                         throw new Error("CPF inválido")
                     }
                 }
@@ -62,30 +62,6 @@ var _md5 = require('md5'); var _md52 = _interopRequireDefault(_md5);
           telefone: {
             type: _sequelize2.default.STRING(20),
           },
-          id_cargo: {
-            type: _sequelize2.default.INTEGER,
-            allowNull: true,
-            foreignKey: true,
-            references: {model: "cargos", key: "id"}, 
-          },
-          setor: {
-            type: _sequelize2.default.INTEGER,
-            foreignKey: true,
-            allowNull: true,
-            references: {model: "setores", key: "id"},
-          },
-          setor_responsavel: { 
-            type: _sequelize2.default.INTEGER, 
-            foreignKey: true,
-            allowNull: true,
-            references: {model: "setores", key: "id"},
-          },
-          perfil_id: {
-            type: _sequelize2.default.INTEGER, 
-            foreignKey: true, 
-            allowNull: true,
-            references: {model: "perfils", key: "id"},
-          },
           password: {
             type: _sequelize2.default.VIRTUAL
           },
@@ -96,19 +72,15 @@ var _md5 = require('md5'); var _md52 = _interopRequireDefault(_md5);
                 msg: "A senha deve ter no minimo 10 caracteres até 50 caracteres"
             }
           },
-          id_empresa: {
+          id_foto: {
             type: _sequelize2.default.INTEGER,
-            allowNull: false,
+            allowNull: true,
             references: {
-              model: 'empresas',
+              model: 'arquivos',
               key: 'id',
             },
             onDelete: 'CASCADE',
             onUpdate: 'CASCADE',
-          },
-          id_foto: {
-            type: _sequelize2.default.INTEGER,
-            allowNull: true,
           },
           created_at: {
             type: _sequelize2.default.DATE,
@@ -120,12 +92,12 @@ var _md5 = require('md5'); var _md52 = _interopRequireDefault(_md5);
           }
         },{
             sequelize,
-            tableName: 'funcionarios'
+            tableName: 'empresas'
         });
         
-        this.addHook("beforeSave", funcionario => {
-            if(funcionario.password){
-                funcionario.password_hash = _md52.default.call(void 0, funcionario.password)
+        this.addHook("beforeSave", empresa => {
+            if(empresa.password){
+                empresa.password_hash = _md52.default.call(void 0, empresa.password)
             }
         });
 
@@ -134,18 +106,6 @@ var _md5 = require('md5'); var _md52 = _interopRequireDefault(_md5);
     }
 
     static associate(models){
-      this.hasMany(models.Chamado, {
-        foreignKey: "id_funcionario_criador", 
-        onDelete: 'cascade' 
-      });
-      this.hasMany(models.Chamado, {
-        foreignKey: "id_funcionario_resp",
-        onDelete: 'cascade' 
-      });
-      this.belongsTo(models.Perfil,{ 
-        foreignKey: "perfil_id",  
-        onDelete: 'cascade' 
-      });
       this.hasMany(models.Arquivo, { 
         foreignKey: 'id_dono', 
         onDelete: 'cascade',
@@ -157,21 +117,5 @@ var _md5 = require('md5'); var _md52 = _interopRequireDefault(_md5);
         as: 'Photo',
         sourceKey: 'id_foto'
       });
-      this.hasMany(models.Comentario, { 
-        foreignKey: 'id_funcionario_criador', 
-        onDelete: 'cascade' 
-      });
-      this.belongsTo(models.Cargo, {
-        foreignKey: "id_cargo",
-        onDelete: 'cascade'
-      });
-      this.belongsTo(models.Setores, {
-        foreignKey: 'setor',
-        onDelete: "cascade"
-      });
-      this.belongsTo(models.Setores, {
-        foreignKey: 'setor_responsavel',
-        onDelete: "cascade"
-      });
     }
-} exports.default = Funcionario;
+} exports.default = Empresas;

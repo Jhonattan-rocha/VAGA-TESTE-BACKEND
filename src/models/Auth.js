@@ -27,7 +27,7 @@ export default class Auth extends Model{
             validate: { 
                 cpfValidator: function(value){
                     if (String(value).replace(/\D/g, '').length > 20 || String(value).replace(/\D/g, '').length === 0){
-                        throw new Error("CPF inválido")
+                        throw new Error("CNPJ/CPF inválido")
                     }
                 }
             }

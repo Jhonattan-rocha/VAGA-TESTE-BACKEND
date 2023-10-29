@@ -1,6 +1,6 @@
 import Sequelize  from "sequelize";
 import database from "../config/database";
-import Funcionario from "../models/Funcionario";
+import Empresa from "../models/Empresa";
 import Arquivo from "../models/Arquivo";
 import Auth from "../models/Auth";
 
@@ -22,7 +22,7 @@ export async function InitTenantAuth(schema, tenantOk=false){
 
 
 export async function InitTenant(schema, tenantOk=false){
-    const models = [Funcionario, Arquivo]
+    const models = [Empresa, Arquivo]
 
     const connection = new Sequelize(database)
 
@@ -39,7 +39,7 @@ export async function InitTenant(schema, tenantOk=false){
 }
 
 export async function InitTenantModels(schema, connection){
-    const models = [Funcionario, Arquivo]
+    const models = [Empresa, Arquivo]
     await connection.query(`CREATE SCHEMA IF NOT EXISTS ${schema};`);
     await connection.query(`USE ${schema};`);
     models.forEach(model=>{model.init(connection)});

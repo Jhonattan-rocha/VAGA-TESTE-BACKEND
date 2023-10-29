@@ -1,28 +1,27 @@
 "use strict";Object.defineProperty(exports, "__esModule", {value: true}); function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; } function _nullishCoalesce(lhs, rhsFn) { if (lhs != null) { return lhs; } else { return rhsFn(); } }var _Index = require('../database/Index');
-var _TenantLoader = require('../services/TenantLoader');
 var _Auth = require('../models/Auth'); var _Auth2 = _interopRequireDefault(_Auth);
-var _Funcionario = require('../models/Funcionario'); var _Funcionario2 = _interopRequireDefault(_Funcionario);
+var _Empresa = require('../models/Empresa'); var _Empresa2 = _interopRequireDefault(_Empresa);
 var _md5 = require('md5'); var _md52 = _interopRequireDefault(_md5);
+var _TenantLoader = require('../services/TenantLoader');
 
-class FuncionarioController {
-  //criar um usuario, store 
+class EmpresaController {
   async store(req, res) {
     try {
 
       await _Index.InitTenantAuth.call(void 0, 'auth', true);
 
-      if (String(req.body.cpf).replace(/\D/g, '').length !== 11){
+      if (String(req.body.cnpj).replace(/\D/g, '').length !== 11){
           return res.status(400).json({
             result: null,
             error: "cpf inválido"
           }); 
       }
 
-      req.body.cpf = String(req.body.cpf).replace(/\D/g, '');
+      req.body.cnpj = String(req.body.cnpj).replace(/\D/g, '');
       req.body.telefone = String(req.body.telefone).replace(/\D/g, '');
 
       try{
-        const find = await _Auth2.default.findOne({ where: { cpf_cnpj: req.body.cpf } });
+        const find = await _Auth2.default.findOne({ where: { cpf_cnpj: req.body.cnpj } });
   
         if(find) {
           return res.status(409).json({
@@ -36,22 +35,23 @@ class FuncionarioController {
           error: "CPF já cadastrado"
         });
       }
-
-      const auth_user = await _Auth2.default.create({ nome: req.body.nome, cpf_cnpj: req.body.cpf, email: req.body.email, password_hash: _md52.default.call(void 0, req.body.password), tenant_id: req.body.tenant_id, salt: "" });
+      const tenantid = _TenantLoader.generateRandomString.call(void 0, 20);
+      const auth_user = await _Auth2.default.create({ nome: req.body.nome, cpf_cnpj: req.body.cnpj, email: req.body.email, password_hash: _md52.default.call(void 0, req.body.password), tenant_id: tenantid, salt: "" });
       
-      await _Index.InitTenant.call(void 0, req.body.tenant_id, true);
+      await _Index.InitTenant.call(void 0, tenantid, false);
 
-      const funcionario = await _Funcionario2.default.create(req.body, req.fields);
-      funcionario.setDataValue("password", "Não interessa");
+      const empresa = await _Empresa2.default.create(req.body, req.fields);
+      empresa.setDataValue("password", "Não interessa");
 
-      await auth_user.update({id_relacional: funcionario.id, id_foto: _nullishCoalesce(funcionario.id_foto, () => ( 0))});
+      await auth_user.update({id_relacional: empresa.id, id_foto: _nullishCoalesce(empresa.id_foto, () => ( 0))});
+      empresa.setDataValue('password', 'Não interessa');
 
-      return res.status(200).json({result: funcionario});
+      return res.status(200).json({result: empresa});
     }catch(err){
       console.log(err)
       return res.status(400).json({
             result: null,
-            error: "Erro ao cadastrar funcionario"
+            error: "Erro ao cadastrar empresa"
       });
     };
   };
@@ -59,13 +59,13 @@ class FuncionarioController {
   async index(req, res){
     try{
       const rules = {...req.fields, ...req.filter}
-      const funcionarios = await _Funcionario2.default.findAll({...rules});
-      return res.status(200).json({result: funcionarios});
+      const empresas = await _Empresa2.default.findAll({...rules});
+      return res.status(200).json({result: empresas});
     }catch(err){
       console.log(err)
       return res.status(400).json({
             result: null,
-            error: "Erro ao buscar os funcionarios"
+            error: "Erro ao buscar os empresas"
       });
     };
   };
@@ -79,12 +79,12 @@ class FuncionarioController {
           error: "ID inválido ou não encontrado"
         });
       };
-      const funcionario = await _Funcionario2.default.findByPk(id, req.fields);
-      return res.status(200).json({result: funcionario});
+      const empresa = await _Empresa2.default.findByPk(id, req.fields);
+      return res.status(200).json({result: empresa});
     }catch(err){
       return res.status(400).json({
         result: null,
-        error: "Erro ao buscar o funcionario"
+        error: "Erro ao buscar a empresa"
       });
     };
   };
@@ -98,25 +98,25 @@ class FuncionarioController {
           error: "ID não encontrado ou inválido"
         });
       };
-      const funcionario = await _Funcionario2.default.findByPk(id, req.fields);
-      const auth = await _Auth2.default.findOne({where: {cpf_cnpj: funcionario.cpf}});
+      const empresa = await _Empresa2.default.findByPk(id, req.fields);
+      const auth = await _Auth2.default.findOne({where: {cpf_cnpj: empresa.cnpj}});
 
-      if (!funcionario){
+      if (!empresa){
         return res.status(404).json({
           result: null,
           error: "Usuario não encontrado"
         });
       };
 
-      const result = await funcionario.update({...req.body});
-      const result2 = await auth.update({email: result.email, cpf_cnpj: result.cpf, id_foto: _nullishCoalesce(result.id_foto, () => ( 0))});
+      const result = await empresa.update({...req.body});
+      const result2 = await auth.update({email: result.email, cpf_cnpj: result.cnpj, id_foto: _nullishCoalesce(result.id_foto, () => ( 0))});
 
       return res.status(200).json({result: result});
     }catch(err){
       console.log(err) 
       return res.status(400).json({
             result: null,
-            error: "Erro ao buscar o funcionario"
+            error: "Erro ao buscar a empresa"
       });
     };
   };
@@ -131,10 +131,10 @@ class FuncionarioController {
           error: "ID não encontrado ou inválido"
         });
       };
-      const funcionario = await _Funcionario2.default.findByPk(id, req.fields);
-      const auth = await _Auth2.default.findOne({where: {cpf_cnpj: funcionario.cpf}});
+      const empresa = await _Empresa2.default.findByPk(id, req.fields);
+      const auth = await _Auth2.default.findOne({where: {cpf_cnpj: empresa.cnpj}});
 
-      if (!funcionario){
+      if (!empresa){
         return res.status(404).json({
           result: null,
           error: "Usuario não encontrado"
@@ -142,19 +142,19 @@ class FuncionarioController {
       };
 
       await auth.destroy();
-      await funcionario.destroy();
+      await empresa.destroy();
 
-      return res.status(200).json({result: funcionario});
+      return res.status(200).json({result: empresa});
     }catch(err){
       return res.status(400).json({
         result: null,
-        error: "Erro ao buscar o funcionario"
+        error: "Erro ao buscar a empresa"
       });
     };
   };
 }; 
 
-exports. default = new FuncionarioController();
+exports. default = new EmpresaController();
 
 /**
  * index - lista de tudo - GET

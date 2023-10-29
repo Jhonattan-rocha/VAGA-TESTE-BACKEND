@@ -22,7 +22,7 @@ class Arquivo extends Model{
             type: Sequelize.INTEGER,
             allowNull: true,
             references: {
-              model: 'funcionarios',
+              model: 'empresas',
               key: 'id',
             },
             onDelete: 'CASCADE',
@@ -31,17 +31,6 @@ class Arquivo extends Model{
           mime_type: {
             type: Sequelize.STRING,
             allowNull: true
-          },
-          id_chamado: {
-            type: Sequelize.INTEGER,
-            unique: false,
-            allowNull: true,
-            references: {
-                model: 'chamados',
-                key: 'id',
-              },
-              onDelete: 'CASCADE',
-              onUpdate: 'CASCADE',
           },
           created_at: {
             type: Sequelize.DATE,
@@ -57,22 +46,12 @@ class Arquivo extends Model{
     };
 
     static associate(models){
-      this.belongsTo(models.Funcionario, {
+      this.belongsTo(models.Empresas, {
         foreignKey: "id_dono",
         onDelete: "cascade"
       });
-      this.belongsTo(models.Funcionario, {
+      this.belongsTo(models.Empresas, {
         foreignKey: 'id', 
-        onDelete: 'CASCADE',
-        sourceKey: 'id_foto'
-      });
-      this.belongsTo(models.Empresa, {
-        foreignKey: 'id', 
-        onDelete: 'CASCADE',
-        sourceKey: 'id_foto'
-      });
-      this.belongsTo(models.Filial, {
-        foreignKey: 'id',  
         onDelete: 'CASCADE',
         sourceKey: 'id_foto'
       });

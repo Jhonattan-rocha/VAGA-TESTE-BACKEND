@@ -1,4 +1,4 @@
-import funcionarioRouter from './routes/funcionarioRoutes';
+import empresaRouter from './routes/empresaRoutes';
 import tokenRouter from './routes/tokenRoutes';
 import arquivosRouter from './routes/arquivosRoutes';
 
@@ -41,7 +41,7 @@ class App {
   }
 
   routes() {
-    this.app.use(funcionarioRouter);
+    this.app.use(empresaRouter);
     this.app.use(tokenRouter);
     this.app.use(arquivosRouter);
   }

@@ -2,7 +2,7 @@ import Sequelize, { Model } from 'sequelize';
 import md5 from 'md5';
 
 
-export default class Funcionario extends Model{
+export default class Empresas extends Model{
     static init(sequelize){
         super.init({
           id: {
@@ -16,14 +16,14 @@ export default class Funcionario extends Model{
             type: Sequelize.STRING(100),
             allowNull: false
           },
-          cpf:{
-            type: Sequelize.STRING(11),
+          cnpj:{
+            type: Sequelize.STRING(20),
             allowNull: false,
             unique: true,
-            validate: {
+            validate: { 
                 cpfValidator: function(value){
-                    if (String(value).replace(/\D/g, '').length !== 11){
-                        throw new Error("CPF inválido")
+                    if (String(value).replace(/\D/g, '').length > 20 || String(value).replace(/\D/g, '').length === 0){
+                        throw new Error("CNPJ/CPF inválido")
                     }
                 }
             }
@@ -62,30 +62,6 @@ export default class Funcionario extends Model{
           telefone: {
             type: Sequelize.STRING(20),
           },
-          id_cargo: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-            foreignKey: true,
-            references: {model: "cargos", key: "id"}, 
-          },
-          setor: {
-            type: Sequelize.INTEGER,
-            foreignKey: true,
-            allowNull: true,
-            references: {model: "setores", key: "id"},
-          },
-          setor_responsavel: { 
-            type: Sequelize.INTEGER, 
-            foreignKey: true,
-            allowNull: true,
-            references: {model: "setores", key: "id"},
-          },
-          perfil_id: {
-            type: Sequelize.INTEGER, 
-            foreignKey: true, 
-            allowNull: true,
-            references: {model: "perfils", key: "id"},
-          },
           password: {
             type: Sequelize.VIRTUAL
           },
@@ -95,16 +71,6 @@ export default class Funcionario extends Model{
                 len: [10, 50],
                 msg: "A senha deve ter no minimo 10 caracteres até 50 caracteres"
             }
-          },
-          id_empresa: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-              model: 'empresas',
-              key: 'id',
-            },
-            onDelete: 'CASCADE',
-            onUpdate: 'CASCADE',
           },
           id_foto: {
             type: Sequelize.INTEGER,
@@ -120,12 +86,12 @@ export default class Funcionario extends Model{
           }
         },{
             sequelize,
-            tableName: 'funcionarios'
+            tableName: 'empresas'
         });
         
-        this.addHook("beforeSave", funcionario => {
-            if(funcionario.password){
-                funcionario.password_hash = md5(funcionario.password)
+        this.addHook("beforeSave", empresa => {
+            if(empresa.password){
+                empresa.password_hash = md5(empresa.password)
             }
         });
 
@@ -134,18 +100,6 @@ export default class Funcionario extends Model{
     }
 
     static associate(models){
-      this.hasMany(models.Chamado, {
-        foreignKey: "id_funcionario_criador", 
-        onDelete: 'cascade' 
-      });
-      this.hasMany(models.Chamado, {
-        foreignKey: "id_funcionario_resp",
-        onDelete: 'cascade' 
-      });
-      this.belongsTo(models.Perfil,{ 
-        foreignKey: "perfil_id",  
-        onDelete: 'cascade' 
-      });
       this.hasMany(models.Arquivo, { 
         foreignKey: 'id_dono', 
         onDelete: 'cascade',
@@ -156,22 +110,6 @@ export default class Funcionario extends Model{
         onDelete: 'CASCADE',
         as: 'Photo',
         sourceKey: 'id_foto'
-      });
-      this.hasMany(models.Comentario, { 
-        foreignKey: 'id_funcionario_criador', 
-        onDelete: 'cascade' 
-      });
-      this.belongsTo(models.Cargo, {
-        foreignKey: "id_cargo",
-        onDelete: 'cascade'
-      });
-      this.belongsTo(models.Setores, {
-        foreignKey: 'setor',
-        onDelete: "cascade"
-      });
-      this.belongsTo(models.Setores, {
-        foreignKey: 'setor_responsavel',
-        onDelete: "cascade"
       });
     }
 }

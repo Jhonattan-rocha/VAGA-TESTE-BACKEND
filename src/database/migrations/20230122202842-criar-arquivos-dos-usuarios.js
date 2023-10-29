@@ -32,17 +32,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
-      id_chamado: {
-        type: Sequelize.INTEGER,
-        unique: false,
-        allowNull: true,
-        references: {
-            model: 'chamados',
-            key: 'id',
-          },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE',
-      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -53,16 +42,6 @@ module.exports = {
       }
     });
 
-    await queryInterface.addConstraint('empresas', {
-      fields: ['id_foto'],
-      type: 'foreign key',
-      references: {
-        table: 'arquivos',
-        field: 'id',
-      },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    });
 
     await queryInterface.addConstraint('funcionarios', {
       fields: ['id_foto'],
@@ -74,18 +53,6 @@ module.exports = {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     });
-
-    await queryInterface.addConstraint('filials', {
-      fields: ['id_foto'],
-      type: 'foreign key',
-      references: {
-        table: 'arquivos',
-        field: 'id',
-      },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    });
-
 
   },
 

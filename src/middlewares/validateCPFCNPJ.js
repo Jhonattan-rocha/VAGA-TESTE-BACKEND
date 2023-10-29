@@ -1,6 +1,5 @@
 export default async (req, res, next) => {
   let doc = req.body.cnpj ? req.body.cnpj : req.body.cpf
-   
   // Remove caracteres não numéricos
   doc = String(doc).replace(/\D/g, '');
 
