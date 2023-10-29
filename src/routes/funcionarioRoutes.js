@@ -8,7 +8,7 @@ import TenantMiddleware from '../middlewares/TenantMiddleWare';
 
 const router = new Router();
 
-router.post('/funcionario/', loginriquired, validateCPFCNPJ, TenantMiddleware, FuncionarioController.store);
+router.post('/funcionario/', validateCPFCNPJ, TenantMiddleware, FuncionarioController.store);
 router.get("/funcionarios/", loginriquired, getAtributes, filter, TenantMiddleware, FuncionarioController.index);
 router.get("/funcionario/:id", loginriquired, getAtributes, TenantMiddleware, FuncionarioController.show);
 router.put('/funcionario/:id', loginriquired, getAtributes, TenantMiddleware, FuncionarioController.update);
